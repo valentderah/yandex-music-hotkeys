@@ -32,14 +32,14 @@ class MediaController:
         self.user32.EnumWindows(WNDENUMPROC(self.enum_callback), 0)
         return self.enum_results[0] if self.enum_results else None
 
-    def send_appcommand(self, hwnd: int, cmd: int) -> bool:
+    def send_command(self, hwnd: int, cmd: int) -> bool:
         if not hwnd or not self.user32.IsWindow(hwnd):
             return False
         return self.user32.SendMessageW(hwnd, WM_APPCOMMAND, hwnd, cmd << 16) != 0
 
     def send_media_key(self, cmd: int) -> bool:
         hwnd = self.find_yandex_music_window()
-        return self.send_appcommand(hwnd, cmd) if hwnd else False
+        return self.send_command(hwnd, cmd) if hwnd else False
 
     def next_track(self) -> bool:
         return self.send_media_key(APPCOMMAND_MEDIA_NEXTTRACK)
