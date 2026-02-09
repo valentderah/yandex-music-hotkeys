@@ -1,5 +1,6 @@
 import subprocess
 import textwrap
+import os
 
 from core.constants import APP_NAME, APP_VERSION
 
@@ -44,13 +45,18 @@ def generate_version_file():
         """
     ).strip()
 
-    with open("version_info.txt", "w", encoding="utf-8") as f:
+    if not os.path.exists("dist"):
+        os.makedirs("dist")
+    
+    file_path = os.path.join("dist", "version_info.txt")
+    with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
-    print(f"Generated version_info.txt with version {APP_VERSION}")
+    print(f"Generated {file_path} with version {APP_VERSION}")
+    return file_path
 
 
 def main():
-    generate_version_file()
+    version_file = generate_version_file()
 
     cmd = [
         "pyinstaller",
@@ -59,7 +65,7 @@ def main():
         "--name", APP_NAME,
         "--add-data", "assets;assets",
         "--icon", "assets/icon.ico",
-        "--version-file", "version_info.txt",
+        "--version-file", version_file,
         "main.py"
     ]
 
