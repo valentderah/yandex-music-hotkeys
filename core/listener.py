@@ -35,7 +35,7 @@ class HotkeyListener:
             if not combo or action not in action_map:
                 continue
             try:
-                handle = keyboard.add_hotkey(combo, action_map[action], suppress=False)
+                handle = keyboard.add_hotkey(combo, action_map[action], suppress=True)
                 self.hook_handles.append(handle)
             except Exception:
                 pass
