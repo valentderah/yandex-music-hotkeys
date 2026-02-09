@@ -67,6 +67,15 @@ def main():
         "--add-data", "assets;assets",
         "--icon", "assets/icon.ico",
         "--version-file", version_file,
+
+        # Exclude heavy unnecessary modules
+        "--exclude-module", "numpy",
+        "--exclude-module", "matplotlib",
+        "--exclude-module", "tkinter",
+        "--exclude-module", "scipy",
+        "--exclude-module", "pandas",
+        "--exclude-module", "IPython",
+
         "main.py"
     ]
 
