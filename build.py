@@ -6,7 +6,7 @@ import sys
 from core.constants import APP_NAME, APP_VERSION
 
 
-def generate_version_file():
+def generate_version_file() -> str:
     parts = [int(x) for x in APP_VERSION.split(".")]
     while len(parts) < 4:
         parts.append(0)
@@ -46,9 +46,8 @@ def generate_version_file():
         """
     ).strip()
 
-    if not os.path.exists("dist"):
-        os.makedirs("dist")
-    
+    os.makedirs("dist", exist_ok=True)
+
     file_path = os.path.join("dist", "version_info.txt")
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
@@ -56,8 +55,14 @@ def generate_version_file():
     return file_path
 
 
-def main():
+def main() -> None:
     version_file = generate_version_file()
+
+    excluded = [
+        "numpy", "matplotlib", "scipy", "pandas", "IPython",
+        "unittest", "test", "doctest", "pdb", "pydoc",
+        "lib2to3", "xmlrpc", "multiprocessing",
+    ]
 
     cmd = [
         sys.executable, "-m", "PyInstaller",
@@ -67,17 +72,12 @@ def main():
         "--add-data", "assets;assets",
         "--icon", "assets/icon.ico",
         "--version-file", version_file,
-
-        # Exclude heavy unnecessary modules
-        "--exclude-module", "numpy",
-        "--exclude-module", "matplotlib",
-        "--exclude-module", "tkinter",
-        "--exclude-module", "scipy",
-        "--exclude-module", "pandas",
-        "--exclude-module", "IPython",
-
-        "main.py"
     ]
+
+    for mod in excluded:
+        cmd += ["--exclude-module", mod]
+
+    cmd.append("main.py")
 
     print(f"Running: {' '.join(cmd)}")
     subprocess.check_call(cmd)

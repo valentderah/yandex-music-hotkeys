@@ -1,5 +1,3 @@
-import sys
-
 from core.config import Config
 from core.controller import MediaController
 from core.listener import HotkeyListener
@@ -13,10 +11,9 @@ def main() -> None:
 
     listener.start()
 
-    tray = TrayIcon(listener)
+    tray = TrayIcon(listener, config)
     tray.run()
 
 
 if __name__ == "__main__":
     main()
-    sys.exit(0)

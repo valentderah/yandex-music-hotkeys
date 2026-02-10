@@ -38,7 +38,7 @@ class Config:
         hotkeys = data.get("hotkeys") or {}
 
         merged = dict(DEFAULT_HOTKEYS)
-        for key in ("next_track", "previous_track", "play_pause"):
+        for key in DEFAULT_HOTKEYS:
             if key in hotkeys and hotkeys[key]:
                 merged[key] = str(hotkeys[key]).strip().lower()
         
@@ -52,4 +52,11 @@ class Config:
             pass
 
     def get_hotkeys(self) -> Dict[str, str]:
-        return self.load_config().get("hotkeys", DEFAULT_HOTKEYS)
+        return self.load_config().get("hotkeys", dict(DEFAULT_HOTKEYS))
+
+    def save_config(self, hotkeys: Dict[str, str]) -> None:
+        try:
+            with open(self.config_path, "w", encoding="utf-8") as f:
+                json.dump({"hotkeys": hotkeys}, f, indent=2)
+        except OSError:
+            pass
