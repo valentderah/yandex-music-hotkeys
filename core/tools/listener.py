@@ -1,8 +1,10 @@
 import keyboard
-from typing import Dict, Callable, Set, Optional
+from typing import Dict, Callable, Set, Optional, Tuple
 
 from core.tools.controller import MediaController
 from core.config import Config
+
+_MODIFIERS: Tuple[str, ...] = ("ctrl", "shift", "alt", "win")
 
 
 class HotkeyListener:
@@ -35,28 +37,24 @@ class HotkeyListener:
                 self._hotkeys[combo.lower()] = action_map[action]
 
     def _on_key_event(self, event: keyboard.KeyboardEvent) -> bool:
-        key_name = (event.name or "").lower()
+        key_name = (event.name or "").strip().lower()
         if not key_name:
             return True
 
-        if event.event_type == keyboard.KEY_DOWN:
-            self._pressed_keys.add(key_name)
-        elif event.event_type == keyboard.KEY_UP:
+        if event.event_type == keyboard.KEY_UP:
             self._pressed_keys.discard(key_name)
-
-        mods = sorted([k for k in self._pressed_keys if k in ("ctrl", "shift", "alt", "win")])
-        non_mods = [k for k in self._pressed_keys if k not in ("ctrl", "shift", "alt", "win")]
-        if not non_mods:
             return True
 
+        self._pressed_keys.add(key_name)
+        if key_name in _MODIFIERS:
+            return True
+
+        mods = [m for m in _MODIFIERS if m in self._pressed_keys]
         current_combo = "+".join(mods + [key_name])
-
-        if event.event_type == keyboard.KEY_DOWN:
-            callback = self._hotkeys.get(current_combo)
-            if callback:
-                callback()
-                return False
-
+        callback = self._hotkeys.get(current_combo)
+        if callback:
+            callback()
+            return False
         return True
 
     def apply_hotkeys(self) -> None:
