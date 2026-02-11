@@ -1,4 +1,3 @@
-"""Иконка в трее и меню. Управляет жизненным циклом окна настроек."""
 from __future__ import annotations
 
 import os
@@ -10,6 +9,7 @@ from PIL import Image
 
 from core.config import Config
 from core.constants import APP_NAME, get_resource_path
+from core.i18n import t
 from core.tools.listener import HotkeyListener
 from core.ui.contracts import CloseReason
 
@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 
 
 def _enable_dark_tray_menu() -> None:
-    """Включить тёмное контекстное меню (Windows)."""
     try:
         import ctypes
         uxtheme = ctypes.WinDLL("uxtheme")
@@ -42,11 +41,6 @@ def _load_tray_icon() -> Image.Image:
 
 
 class TrayIcon:
-    """
-    Системный трей: пункты Settings, Reload Config, Exit.
-    Окно настроек создаётся один раз в отдельном потоке и переиспользуется (show/hide).
-    """
-
     def __init__(self, listener: HotkeyListener, config: Config) -> None:
         self._listener = listener
         self._config = config
@@ -57,9 +51,9 @@ class TrayIcon:
     def run(self) -> None:
         _enable_dark_tray_menu()
         menu = pystray.Menu(
-            pystray.MenuItem("Settings", self._on_settings_click, default=True),
-            pystray.MenuItem("Reload Config", self._on_reload_click),
-            pystray.MenuItem("Exit", self._on_exit_click),
+            pystray.MenuItem(t("menu.settings"), self._on_settings_click, default=True),
+            pystray.MenuItem(t("menu.reload_config"), self._on_reload_click),
+            pystray.MenuItem(t("menu.exit"), self._on_exit_click),
         )
         self._icon = pystray.Icon(
             "yandex_music_hotkeys",

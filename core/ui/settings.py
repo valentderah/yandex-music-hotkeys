@@ -1,4 +1,3 @@
-"""Окно настроек горячих клавиш. Один экземпляр переиспользуется: скрытие по X, уничтожение по Exit."""
 from __future__ import annotations
 
 import os
@@ -14,11 +13,11 @@ from core.constants import (
     DEFAULT_HOTKEYS,
     get_resource_path,
 )
+from core.i18n import SUPPORTED_LOCALES, set_locale, t
 from core.tools.listener import HotkeyListener
 from core.ui.contracts import CloseReason
 
 
-# --- Тема и размеры ---
 class Theme:
     BG_MAIN = "#000000"
     BG_GROUP = "#1C1C1E"
@@ -39,14 +38,6 @@ class Layout:
     ROW_PADDING = 14
 
 
-HOTKEY_LABELS: Dict[str, str] = {
-    "next_track": "Next track",
-    "previous_track": "Previous track",
-    "play_pause": "Play/Pause",
-}
-
-
-# Инициализация CTk один раз при импорте
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
@@ -139,15 +130,17 @@ class SettingsWindow:
         self._configure_root()
         main = ctk.CTkFrame(self._root, fg_color="transparent")
         main.pack(fill="both", expand=True)
+        self._content_parent = main
         content = ctk.CTkFrame(main, fg_color=Theme.BG_MAIN, corner_radius=0)
         content.pack(fill="both", expand=True)
         self._build_header(content)
         self._build_hotkeys_block(content)
+        self._build_language_block(content)
         self._build_version_block(content)
         self._apply_geometry()
 
     def _configure_root(self) -> None:
-        self._root.title(f"{APP_NAME} — Settings")
+        self._root.title(f"{APP_NAME} — {t('window.settings_title')}")
         self._root.resizable(False, False)
         self._root.configure(fg_color=Theme.BG_MAIN)
         self._set_window_icon()
@@ -163,13 +156,13 @@ class SettingsWindow:
     def _build_header(self, parent: ctk.CTkFrame) -> None:
         ctk.CTkLabel(
             parent,
-            text="Settings",
+            text=t("settings.title"),
             font=ctk.CTkFont(family="Segoe UI Black", size=34),
             text_color=Theme.TITLE_COLOR,
         ).pack(anchor="w", padx=Layout.PADDING_H, pady=(Layout.PADDING_V + 8, 4))
         ctk.CTkLabel(
             parent,
-            text="HOTKEYS",
+            text=t("settings.hotkeys_section"),
             font=ctk.CTkFont(size=13),
             text_color=Theme.SECONDARY_COLOR,
         ).pack(anchor="w", padx=Layout.PADDING_H, pady=(8, 6))
@@ -193,7 +186,7 @@ class SettingsWindow:
     def _build_hotkey_row(self, parent: ctk.CTkFrame, row: int, key: str) -> None:
         ctk.CTkLabel(
             parent,
-            text=HOTKEY_LABELS.get(key, key),
+            text=t(f"hotkeys.{key}"),
             font=ctk.CTkFont(size=17),
             text_color=Theme.LABEL_COLOR,
         ).grid(row=row, column=0, sticky="w", padx=(0, 16), pady=Layout.ROW_PADDING)
@@ -212,6 +205,78 @@ class SettingsWindow:
         btn.grid(row=row, column=1, sticky="e", pady=Layout.ROW_PADDING)
         self._hotkey_buttons[key] = btn
 
+    def _build_language_block(self, parent: ctk.CTkFrame) -> None:
+        ctk.CTkLabel(
+            parent,
+            text=t("settings.general_section"),
+            font=ctk.CTkFont(size=13),
+            text_color=Theme.SECONDARY_COLOR,
+        ).pack(anchor="w", padx=Layout.PADDING_H, pady=(Layout.GROUP_GAP, 6))
+
+        group = ctk.CTkFrame(
+            parent,
+            fg_color=Theme.BG_GROUP,
+            corner_radius=Layout.GROUP_RADIUS,
+        )
+        group.pack(fill="x", padx=Layout.PADDING_H, pady=(0, Layout.GROUP_GAP))
+        inner = ctk.CTkFrame(group, fg_color="transparent")
+        inner.pack(fill="x", padx=16, pady=Layout.ROW_PADDING)
+        inner.grid_columnconfigure(1, weight=1)
+
+        ctk.CTkLabel(
+            inner,
+            text=t("settings.language"),
+            font=ctk.CTkFont(size=17),
+            text_color=Theme.LABEL_COLOR,
+        ).grid(row=0, column=0, sticky="w", padx=(0, 16))
+
+        options = [t("lang.en"), t("lang.ru")]
+        current = t(f"lang.{self._config.get_language()}")
+        self._lang_var = ctk.StringVar(value=current)
+        menu = ctk.CTkOptionMenu(
+            inner,
+            values=options,
+            variable=self._lang_var,
+            width=130,
+            height=32,
+            font=ctk.CTkFont(size=17),
+            fg_color=Theme.BUTTON_BG,
+            button_color=Theme.BUTTON_BG,
+            button_hover_color=Theme.BUTTON_BG,
+            dropdown_fg_color=Theme.BG_GROUP,
+            text_color=Theme.LABEL_COLOR,
+            corner_radius=8,
+            command=self._on_language_changed,
+        )
+        menu.grid(row=0, column=1, sticky="e")
+
+    def _on_language_changed(self, choice: str) -> None:
+        for loc in SUPPORTED_LOCALES:
+            if choice == t("lang." + loc, locale=loc):
+                if loc != self._config.get_language():
+                    self._config.set_language(loc)
+                    set_locale(loc)
+                    self._refresh_ui_language()
+                break
+
+    def _refresh_ui_language(self) -> None:
+        if not self.is_alive():
+            return
+        for child in self._content_parent.winfo_children():
+            child.destroy()
+        content = ctk.CTkFrame(
+            self._content_parent,
+            fg_color=Theme.BG_MAIN,
+            corner_radius=0,
+        )
+        content.pack(fill="both", expand=True)
+        self._build_header(content)
+        self._build_hotkeys_block(content)
+        self._build_language_block(content)
+        self._build_version_block(content)
+        self._apply_geometry()
+        self._root.title(f"{APP_NAME} — {t('window.settings_title')}")
+
     def _build_version_block(self, parent: ctk.CTkFrame) -> None:
         group = ctk.CTkFrame(
             parent,
@@ -224,7 +289,7 @@ class SettingsWindow:
         inner.grid_columnconfigure(1, weight=1)
         ctk.CTkLabel(
             inner,
-            text="Version",
+            text=t("settings.version"),
             font=ctk.CTkFont(size=17),
             text_color=Theme.LABEL_COLOR,
         ).grid(row=0, column=0, sticky="w")
@@ -241,8 +306,6 @@ class SettingsWindow:
         h = max(self._root.winfo_reqheight(), Layout.MIN_HEIGHT)
         self._root.geometry(f"{w}x{h}")
         self._root.minsize(w, h)
-
-    # --- Запись горячих клавиш ---
 
     def _start_record(self, key: str) -> None:
         if self._record_hook is not None:
