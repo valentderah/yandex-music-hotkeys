@@ -51,8 +51,12 @@ class TrayIcon:
     def run(self) -> None:
         _enable_dark_tray_menu()
         menu = pystray.Menu(
-            pystray.MenuItem(t("menu.settings"), self._on_settings_click, default=True),
-            pystray.MenuItem(t("menu.exit"), self._on_exit_click),
+            pystray.MenuItem(
+                lambda _: t("menu.settings"),
+                self._on_settings_click,
+                default=True,
+            ),
+            pystray.MenuItem(lambda _: t("menu.exit"), self._on_exit_click),
         )
         self._icon = pystray.Icon(
             "yandex_music_hotkeys",
@@ -61,6 +65,13 @@ class TrayIcon:
             menu,
         )
         self._icon.run()
+
+    def _on_language_changed(self) -> None:
+        if self._icon is not None:
+            try:
+                self._icon.update_menu()
+            except Exception:
+                pass
 
     def _on_settings_click(
         self,
@@ -94,6 +105,7 @@ class TrayIcon:
             self._config,
             self._listener,
             on_close=self._when_settings_closed,
+            on_language_changed=self._on_language_changed,
         )
         self._settings_window = window
         try:

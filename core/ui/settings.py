@@ -48,10 +48,12 @@ class SettingsWindow:
         config: Config,
         listener: HotkeyListener,
         on_close: Optional[Callable[[CloseReason], None]] = None,
+        on_language_changed: Optional[Callable[[], None]] = None,
     ) -> None:
         self._config = config
         self._listener = listener
         self._on_close_callback = on_close
+        self._on_language_changed_callback = on_language_changed
         self._hotkey_buttons: Dict[str, ctk.CTkButton] = {}
         self._hotkey_values: Dict[str, str] = {}
         self._root = ctk.CTk()
@@ -257,6 +259,9 @@ class SettingsWindow:
                     self._config.set_language(loc)
                     set_locale(loc)
                     self._refresh_ui_language()
+                    self._listener.reload()
+                    if self._on_language_changed_callback:
+                        self._on_language_changed_callback()
                 break
 
     def _refresh_ui_language(self) -> None:
