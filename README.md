@@ -41,5 +41,6 @@ Download `YandexMusicHotkeys.exe` from the releases section or build it yourself
 | Next Track     | `Ctrl` + `Right` (→) |
 | Previous Track | `Ctrl` + `Left` (←)  |
 | Play/Pause     | `Ctrl` + `Space`     |
-| Volume Up      | `Ctrl` + `Up` (↑)    |
-| Volume Down    | `Ctrl` + `Down` (↓)  |
+
+[//]: # (| Volume Up      | `Ctrl` + `Up` &#40;↑&#41;    |)
+[//]: # (| Volume Down    | `Ctrl` + `Down` &#40;↓&#41;  |)
