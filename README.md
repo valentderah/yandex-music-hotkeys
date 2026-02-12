@@ -1,13 +1,11 @@
 English | [Русский](README.ru.md)
 
-# Yandex Music Hotkeys
+## Yandex Music Hotkeys <img src="./assets/icon.png" width="20px">
+
+Global hotkeys for controlling the Yandex Music desktop application on Windows.<br>
+The application runs in the background and allows you to control playback even if the Yandex Music window is minimized or not in focus.
 
 <img src="assets/banner.png">
-
-Global hotkeys for controlling the Yandex Music desktop application on Windows.
-
-The application runs in the background and allows you to control playback even if the Yandex Music window is minimized
-or not in focus.
 
 ## Features
 
@@ -22,7 +20,7 @@ or not in focus.
 
 ### Option 1: Use EXE file
 
-Download `YandexMusicHotkeys.exe` from the releases section or build it yourself.
+Download `Yandex Music Hotkeys.exe` from the releases section or build it yourself.
 
 ### Option 2: Run from Source
 
