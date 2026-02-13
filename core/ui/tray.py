@@ -74,7 +74,11 @@ class TrayIcon:
             APP_NAME,
             menu,
         )
-        self._icon.run()
+        self._icon.run(setup=self._on_tray_ready)
+
+    def _on_tray_ready(self, icon: pystray.Icon) -> None:
+        icon.visible = True
+        self._listener.reload()
 
     def _on_language_changed(self) -> None:
         if self._icon is not None:
@@ -117,7 +121,7 @@ class TrayIcon:
     def _run_settings_ui(self) -> None:
         from core.ui.settings import SettingsWindow
 
-        self._listener.stop()
+        # self._listener.stop()
         window = SettingsWindow(
             self._config,
             self._listener,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Set
 
 import customtkinter as ctk
 import keyboard
@@ -353,16 +353,40 @@ class SettingsWindow:
     def _start_record(self, key: str) -> None:
         if self._record_hook is not None:
             return
+        self._listener.stop()
         self._record_action_key = key
+        
+        pressed_mods: Set[str] = set()
 
         def on_key(event: keyboard.KeyboardEvent) -> None:
-            if self._record_action_key is None or event.event_type != "down":
+            if self._record_action_key is None:
                 return
-            mods = self._pressed_modifiers()
+            
             name = (event.name or "").strip().lower()
-            if not name or name in ("ctrl", "shift", "alt", "win"):
+            if not name:
                 return
+
+            if "ctrl" in name: name = "ctrl"
+            elif "alt" in name: name = "alt"
+            elif "shift" in name: name = "shift"
+            elif "win" in name or "cmd" in name: name = "win"
+
+            if event.event_type == keyboard.KEY_UP:
+                if name in ("ctrl", "alt", "shift", "win"):
+                    pressed_mods.discard(name)
+                return
+
+            if name in ("ctrl", "alt", "shift", "win"):
+                pressed_mods.add(name)
+                return
+
+            mods = sorted(list(pressed_mods))
+
+            order = {"ctrl": 0, "shift": 1, "alt": 2, "win": 3}
+            mods.sort(key=lambda m: order.get(m, 99))
+            
             combo = "+".join(mods + [name]).lower()
+            
             action_key = self._record_action_key
             self._stop_recording()
             if self.is_alive():
@@ -388,6 +412,7 @@ class SettingsWindow:
                 pass
             self._record_hook = None
         self._record_action_key = None
+        self._listener.reload()
 
     def _apply_recorded_combo(self, key: str, combo: str) -> None:
         if not self.is_alive():
