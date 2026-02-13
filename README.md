@@ -20,7 +20,7 @@ The application runs in the background and allows you to control playback even i
 
 ### Option 1: Use EXE file
 
-Download `Yandex Music Hotkeys.exe` from the releases section or build it yourself.
+Download `YMHotkeys.exe` from the releases section or build it yourself.
 
 ### Option 2: Run from Source
 
