@@ -11,6 +11,9 @@ CONFIG_FILENAME = "config.json"
 
 TARGET_WINDOW_TITLES = ["Yandex Music", "Яндекс Музыка"]
 
+YANDEX_MUSIC_PROTOCOL = "yandexmusic://"
+REGISTRY_RUN_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
 DEFAULT_HOTKEYS: Dict[str, str] = {
     "next_track": "ctrl+right",
     "previous_track": "ctrl+left",

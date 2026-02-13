@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import os
 import threading
+import webbrowser
 from typing import Optional, TYPE_CHECKING
 
 import pystray
 from PIL import Image
 
 from core.config import Config
-from core.constants import APP_NAME, get_resource_path
+from core.constants import APP_NAME, YANDEX_MUSIC_PROTOCOL, get_resource_path
 from core.i18n import t
 from core.tools.listener import HotkeyListener
 from core.ui.contracts import CloseReason
@@ -52,9 +53,18 @@ class TrayIcon:
         _enable_dark_tray_menu()
         menu = pystray.Menu(
             pystray.MenuItem(
-                lambda _: t("menu.settings"),
+                lambda _: "",
                 self._on_settings_click,
                 default=True,
+                visible=False,
+            ),
+            pystray.MenuItem(
+                lambda _: t("menu.open_app"),
+                self._on_open_app_click,
+            ),
+            pystray.MenuItem(
+                lambda _: t("menu.settings"),
+                self._on_settings_click,
             ),
             pystray.MenuItem(lambda _: t("menu.exit"), self._on_exit_click),
         )
@@ -72,6 +82,13 @@ class TrayIcon:
                 self._icon.update_menu()
             except Exception:
                 pass
+
+    def _on_open_app_click(
+        self,
+        _icon: pystray.Icon,
+        _item: pystray.MenuItem,
+    ) -> None:
+        webbrowser.open(YANDEX_MUSIC_PROTOCOL)
 
     def _on_settings_click(
         self,

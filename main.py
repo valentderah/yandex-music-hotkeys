@@ -7,6 +7,7 @@ from core.ui.tray import TrayIcon
 
 def main() -> None:
     config = Config()
+    config.fix_autostart_path()
     set_locale(config.get_language())
 
     controller = MediaController()

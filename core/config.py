@@ -2,9 +2,15 @@ import json
 import locale
 import os
 import sys
+import winreg
 from typing import Any, Dict
 
-from core.constants import APP_NAME, CONFIG_FILENAME, DEFAULT_HOTKEYS
+from core.constants import (
+    APP_NAME,
+    CONFIG_FILENAME,
+    DEFAULT_HOTKEYS,
+    REGISTRY_RUN_PATH,
+)
 from core.i18n import DEFAULT_LOCALE, SUPPORTED_LOCALES
 
 
@@ -90,3 +96,74 @@ class Config:
         data = self.load_config()
         data["hotkeys"] = hotkeys
         self._write_config(data)
+
+    @staticmethod
+    def _get_executable_path() -> str:
+        if getattr(sys, "frozen", False):
+            return sys.executable
+        return sys.argv[0]
+
+    def set_autostart(self, enabled: bool) -> None:
+        try:
+            key = winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                REGISTRY_RUN_PATH,
+                0,
+                winreg.KEY_SET_VALUE,
+            )
+            if enabled:
+                exe_path = self._get_executable_path()
+                if " " in exe_path and not exe_path.startswith('"'):
+                    exe_path = f'"{exe_path}"'
+                winreg.SetValueEx(key, APP_NAME, 0, winreg.REG_SZ, exe_path)
+            else:
+                try:
+                    winreg.DeleteValue(key, APP_NAME)
+                except FileNotFoundError:
+                    pass
+            winreg.CloseKey(key)
+        except OSError:
+            pass
+
+    def is_autostart_enabled(self) -> bool:
+        try:
+            key = winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                REGISTRY_RUN_PATH,
+                0,
+                winreg.KEY_READ,
+            )
+            winreg.QueryValueEx(key, APP_NAME)
+            winreg.CloseKey(key)
+            return True
+        except (FileNotFoundError, OSError):
+            return False
+
+    def fix_autostart_path(self) -> None:
+        try:
+            key = winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                REGISTRY_RUN_PATH,
+                0,
+                winreg.KEY_READ | winreg.KEY_SET_VALUE,
+            )
+            try:
+                registered_path, _ = winreg.QueryValueEx(key, APP_NAME)
+                clean_reg_path = registered_path
+                if clean_reg_path.startswith('"') and clean_reg_path.endswith('"'):
+                    clean_reg_path = clean_reg_path[1:-1]
+                
+                current_path = self._get_executable_path()
+                clean_reg_path = os.path.abspath(clean_reg_path)
+                current_path = os.path.abspath(current_path)
+
+                if clean_reg_path.lower() != current_path.lower():
+                    path_to_write = current_path
+                    if " " in path_to_write:
+                        path_to_write = f'"{path_to_write}"'
+                    winreg.SetValueEx(key, APP_NAME, 0, winreg.REG_SZ, path_to_write)
+            except FileNotFoundError:
+                pass
+            winreg.CloseKey(key)
+        except OSError:
+            pass

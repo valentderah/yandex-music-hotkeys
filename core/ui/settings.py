@@ -252,6 +252,44 @@ class SettingsWindow:
         )
         menu.grid(row=0, column=1, sticky="e")
 
+        self._build_autostart_row(inner, 1)
+
+    def _build_autostart_row(self, parent: ctk.CTkFrame, row: int) -> None:
+        ctk.CTkLabel(
+            parent,
+            text=t("settings.autostart"),
+            font=ctk.CTkFont(size=17),
+            text_color=Theme.LABEL_COLOR,
+        ).grid(row=row, column=0, sticky="w", padx=(0, 16), pady=(Layout.ROW_PADDING, 0))
+
+        switch = ctk.CTkSwitch(
+            parent,
+            text="",
+            onvalue=True,
+            offvalue=False,
+            command=self._on_autostart_toggled,
+            width=50,
+            height=24,
+            switch_width=50,
+            switch_height=24,
+            fg_color=Theme.BUTTON_BG,
+            progress_color=Theme.BUTTON_HOVER,  # Just using a color from theme
+        )
+        # CTkSwitch doesn't have a direct boolean var in constructor usually, 
+        # but we can set it. Or use variable.
+        # Let's check CTkSwitch usage. usually it takes variable or command.
+        # I will use a variable to set initial state.
+        
+        var = ctk.BooleanVar(value=self._config.is_autostart_enabled())
+        switch.configure(variable=var)
+        switch.grid(row=row, column=1, sticky="e", pady=(Layout.ROW_PADDING, 0))
+        self._autostart_switch = switch
+
+    def _on_autostart_toggled(self) -> None:
+        if hasattr(self, "_autostart_switch"):
+            enabled = self._autostart_switch.get()
+            self._config.set_autostart(bool(enabled))
+
     def _on_language_changed(self, choice: str) -> None:
         for loc in SUPPORTED_LOCALES:
             if choice == t("lang." + loc, locale=loc):

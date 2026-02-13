@@ -7,6 +7,7 @@ DEFAULT_LOCALE = "en"
 
 _TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
+        "menu.open_app": "Open Yandex Music",
         "menu.settings": "Settings",
         "menu.exit": "Exit",
         "window.settings_title": "Settings",
@@ -14,6 +15,7 @@ _TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "settings.hotkeys_section": "HOTKEYS",
         "settings.general_section": "GENERAL",
         "settings.language": "Language",
+        "settings.autostart": "Run at startup",
         "settings.version": "Version",
         "hotkeys.next_track": "Next track",
         "hotkeys.previous_track": "Previous track",
@@ -22,17 +24,19 @@ _TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "lang.ru": "Русский",
     },
     "ru": {
+        "menu.open_app": "Открыть Яндекс Музыку",
         "menu.settings": "Настройки",
-        "menu.exit": "Выход",
+        "menu.exit": "Закрыть",
         "window.settings_title": "Настройки",
         "settings.title": "Настройки",
         "settings.hotkeys_section": "ГОРЯЧИЕ КЛАВИШИ",
         "settings.general_section": "ОБЩИЕ",
         "settings.language": "Язык",
+        "settings.autostart": "Автозагрузка приложения",
         "settings.version": "Версия",
         "hotkeys.next_track": "Следующий трек",
         "hotkeys.previous_track": "Предыдущий трек",
-        "hotkeys.play_pause": "Воспроизведение / пауза",
+        "hotkeys.play_pause": "Воспроизведение/Пауза",
         "lang.en": "English",
         "lang.ru": "Русский",
     },
