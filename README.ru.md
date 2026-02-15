@@ -20,8 +20,8 @@
 
 ### Вариант 1: Использование EXE файла
 
-Скачайте `YMHotkeys.exe` из раздела
-релизов (https://github.com/valentderah/yandex-music-hotkeys/releases/download/v1.0.0/YMHotkeys.exe).
+Скачайте [YMHotkeys.exe](https://github.com/valentderah/yandex-music-hotkeys/releases/download/v1.0.0/YMHotkeys.exe) из раздела
+[релизов](https://github.com/valentderah/yandex-music-hotkeys/releases).
 
 ### Вариант 2: Самостоятельный запуск или сборка
 

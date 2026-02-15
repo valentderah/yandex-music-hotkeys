@@ -20,8 +20,8 @@ or not in focus.
 
 ### Option 1: Use EXE file
 
-Download `YMHotkeys.exe` from
-the [releases](https://github.com/valentderah/yandex-music-hotkeys/releases/download/v1.0.0/YMHotkeys.exe) section.
+Download [YMHotkeys.exe](https://github.com/valentderah/yandex-music-hotkeys/releases/download/v1.0.0/YMHotkeys.exe) from
+the [releases](https://github.com/valentderah/yandex-music-hotkeys/releases) section.
 
 ### Option 2: Run from source or build
 
